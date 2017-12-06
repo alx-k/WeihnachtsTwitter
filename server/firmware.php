@@ -1,5 +1,5 @@
 <?php
-    $githubApiUrl = "https://api.github.com/repos/blackhawk92/continuous-integration-test/releases/latest";
+    $githubApiUrl = "https://api.github.com/repos/blackhawk92/WeihnachtsTwitter/releases/latest";
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

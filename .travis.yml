@@ -14,7 +14,7 @@ script:
 - platformio run -e nodemcuv2_deploy
 deploy:
   on:
-    repo: blackhawk92/continuous-integration-test
+    repo: blackhawk92/WeihnachtsTwitter
     all_branches: true
     condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
   skip_cleanup: true
