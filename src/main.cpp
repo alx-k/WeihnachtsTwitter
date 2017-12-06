@@ -9,7 +9,7 @@
 #include <Ticker.h>
 
 
-#define CHECK_INTERVAL 60
+#define CHECK_INTERVAL 300 //5 Minuten sollten reichen
 // Stringifying the BUILD_TAG parameter
 #define TEXTIFY(A) #A
 #define ESCAPEQUOTE(A) TEXTIFY(A)
@@ -21,6 +21,34 @@ boolean doUpdateCheck = true;
 
 void enableUpdateCheck() {
   doUpdateCheck = true;
+}
+
+void doUpdateIfNeeded() {
+  // press nodemcu's flash button
+  int flashButtonState = digitalRead(0);
+  if (flashButtonState == LOW || doUpdateCheck) {
+    Serial.println("Going to update firmware...");
+    if((WiFiMulti.run() == WL_CONNECTED)) {
+
+            Serial.println("Checking for Update. Current version: " + buildTag);
+            t_httpUpdate_return ret = ESPhttpUpdate.update("http://www.squix.org/blog/firmware.php?tag=" + buildTag);
+
+            switch(ret) {
+                case HTTP_UPDATE_FAILED:
+                    Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+                    break;
+
+                case HTTP_UPDATE_NO_UPDATES:
+                    Serial.println("HTTP_UPDATE_NO_UPDATES");
+                    break;
+
+                case HTTP_UPDATE_OK:
+                    Serial.println("HTTP_UPDATE_OK");
+                    break;
+            }
+        }
+        doUpdateCheck = false;
+    }
 }
 
 void setup() {
@@ -45,31 +73,7 @@ void setup() {
 }
 
 void loop() {
-    // press nodemcu's flash button
-    int flashButtonState = digitalRead(0);
-    if (flashButtonState == LOW || doUpdateCheck) {
-      Serial.println("Going to update firmware...");
-      if((WiFiMulti.run() == WL_CONNECTED)) {
-
-              Serial.println("Checking for Update. Current version: " + buildTag);
-              t_httpUpdate_return ret = ESPhttpUpdate.update("http://www.squix.org/blog/firmware.php?tag=" + buildTag);
-
-              switch(ret) {
-                  case HTTP_UPDATE_FAILED:
-                      Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-                      break;
-
-                  case HTTP_UPDATE_NO_UPDATES:
-                      Serial.println("HTTP_UPDATE_NO_UPDATES");
-                      break;
-
-                  case HTTP_UPDATE_OK:
-                      Serial.println("HTTP_UPDATE_OK");
-                      break;
-              }
-          }
-          doUpdateCheck = false;
-      }
+    doUpdateIfNeeded();
 
 
 }
